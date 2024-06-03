@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.arcadia.arciegg.screen.LoginScreen
+import com.arcadia.arciegg.screen.MonitoringScreen
 import com.arcadia.arciegg.ui.theme.ArciEggTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,7 +21,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ArciEggTheme {
-                LoginScreen(R.drawable.flip_2)
+                MonitoringScreen()
+                //LoginScreen(R.drawable.flip_2)
                 /* A surface container using the 'background' color from the theme
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
