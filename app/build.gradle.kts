@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -59,6 +60,11 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.database)
+    //implementation(libs.firebase.auth)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -68,5 +74,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     //extended Icon
-    implementation ("androidx.compose.material:material-icons-extended-android:1.5.4")
+    implementation (libs.androidx.material.icons.extended.android)
+
+    implementation(libs.mpandroidchart)
+
+    implementation(libs.androidx.ui.text.google.fonts)
+    //viewModel
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 }

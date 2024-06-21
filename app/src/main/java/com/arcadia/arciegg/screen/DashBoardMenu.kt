@@ -31,10 +31,15 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.NotificationsNone
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.colorResource
@@ -59,77 +65,109 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MonitoringScreen() {
+fun DashBoardMenu(
+    onSignOut: () -> Unit,
+    onNotication: () -> Unit
+) {
 //    val gradient = Brush.verticalGradient(
 //        colors = listOf(
 //            colorResource(id = R.color.orange100),
 //            colorResource(id = R.color.orange500)
 //        )
 //    )
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(colorResource(R.color.orange50))
-            .verticalScroll(rememberScrollState())
-        ,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box{
-            ElevatedCard(
-                modifier = Modifier.fillMaxWidth().height(380.dp),
-                colors = CardDefaults.elevatedCardColors(colorResource(R.color.orange200)),
-                shape = RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp, bottomStart = 68.dp, bottomEnd = 0.dp)
-            ) { }
-            Image(
-                painter = painterResource(R.drawable.inkubator_telur_bebek_2024_jun_01_06_03_54pm_000_customizedview158771619164),
-                contentDescription = "background image",
-                modifier = Modifier.offset(x = 180.dp, y = 115.dp)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
+                title = {
+                    Text(text = "Arci Egg")
+                },
+                actions = {
+                    HeaderDashboard(
+                        onSignOut = onSignOut,
+                        onNotication = onNotication
+                    )
+                }
             )
+        },
+        content = { paddingValues ->
+            Box(modifier = Modifier.padding(paddingValues)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                        .verticalScroll(rememberScrollState())
+                    ,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Box{
+                        ElevatedCard(
+                            modifier = Modifier.fillMaxWidth().height(300.dp),
+                            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                            shape = RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp, bottomStart = 68.dp, bottomEnd = 0.dp)
+                        ) { }
+                        Image(
+                            painter = painterResource(R.drawable.inkubator_telur_bebek_2024_jun_01_06_03_54pm_000_customizedview158771619164),
+                            contentDescription = "background image",
+                            modifier = Modifier.offset(x = 200.dp, y = 70.dp).scale(1f)
+                        )
 
-            Column {
-                HeaderDashboard()
-                Spacer(modifier = Modifier.height(24.dp))
-                ProfileDasboard()
+                        Column {
+                            //HeaderDashboard()
+                            Spacer(modifier = Modifier.height(24.dp))
+                            ProfileDasboard()
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(15.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(horizontal = 18.dp)
+                    ) {
+                        Text(text = "Monitoring",
+                            style = TextStyle(
+                                fontSize = 16.sp
+                            ),
+                            modifier = Modifier.padding(end = 10.dp),
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        HorizontalDivider()
+                    }
+                    Spacer(modifier = Modifier.height(15.dp))
+                    MiniDashboard()
+                    Spacer(modifier = Modifier.height(15.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(horizontal = 18.dp)
+                    ) {
+                        Text(text = "Tentang Kontrol Otomatis",
+                            style = TextStyle(
+                                fontSize = 16.sp
+                            ),
+                            modifier = Modifier.padding(end = 10.dp),
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        HorizontalDivider()
+                    }
+                    Spacer(modifier = Modifier.height(15.dp))
+                    LazyAboutControl()
+                }
             }
         }
-        Spacer(modifier = Modifier.height(15.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(horizontal = 18.dp)
-        ) {
-            Text(text = "Monitoring",
-                style = TextStyle(
-                    fontSize = 16.sp
-                ),
-                modifier = Modifier.padding(end = 10.dp)
-            )
-            HorizontalDivider()
-        }
-        Spacer(modifier = Modifier.height(15.dp))
-        MiniDashboard()
-        Spacer(modifier = Modifier.height(15.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(horizontal = 18.dp)
-        ) {
-            Text(text = "Tentang Kontrol Otomatis",
-                style = TextStyle(
-                    fontSize = 16.sp
-                ),
-                modifier = Modifier.padding(end = 10.dp)
-            )
-            HorizontalDivider()
-        }
-        Spacer(modifier = Modifier.height(15.dp))
-        LazyAboutControl()
-    }
+    )
 }
 
 @Composable
-fun HeaderDashboard() {
+fun HeaderDashboard(
+    onSignOut: () -> Unit,
+    onNotication: () -> Unit
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
@@ -148,10 +186,11 @@ fun HeaderDashboard() {
             style = TextStyle(
                 fontSize = 20.sp
             ),
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(start = 12.dp))
         Spacer(modifier = Modifier.width(120.dp))
         IconButton(
-            onClick = {/*TODO*/},
+            onClick = onSignOut,
             modifier = Modifier.width(50.dp)
         ) {
             Column(
@@ -160,12 +199,17 @@ fun HeaderDashboard() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(imageVector = Icons.AutoMirrored.Filled.Logout, contentDescription = "Logout")
-                Text(text = "keluar")
+                Text(text = "keluar",
+                    style = TextStyle(
+                        fontSize = 12.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
             }
         }
         Spacer(modifier = Modifier.width(26.dp))
         IconButton(
-            onClick = {/*TODO*/},
+            onClick = onNotication,
             modifier = Modifier
                 .width(50.dp)
                 .padding()
@@ -187,7 +231,8 @@ fun ProfileDasboard() {
             text = "Selamat Datang",
             style = TextStyle(
                 fontSize = 24.sp
-            )
+            ),
+            color = MaterialTheme.colorScheme.onBackground
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -205,7 +250,9 @@ fun ProfileDasboard() {
                 text = "userid102597",
                 style = TextStyle(
                     fontSize = 16.sp
-                ))
+                ),
+                color = MaterialTheme.colorScheme.onBackground
+            )
         }
     }
 }
@@ -217,7 +264,7 @@ fun MiniDashboard() {
             .width(328.dp)
             .height(185.dp),
         shape = RoundedCornerShape(36.dp),
-        colors = CardDefaults.elevatedCardColors(colorResource(R.color.orange200))
+        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -292,9 +339,7 @@ fun CardIndicator(
             .height(70.dp),
         shape = RoundedCornerShape(21.dp),
         colors = CardDefaults.elevatedCardColors(colorResource(colorBackgroundIndicator)),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 21.dp
-        )
+
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -305,7 +350,8 @@ fun CardIndicator(
                 style = TextStyle(
                     fontSize = 16.sp
                 ),
-                modifier = Modifier.padding(top = 3.dp)
+                modifier = Modifier.padding(top = 3.dp),
+                color = MaterialTheme.colorScheme.onBackground
             )
             Row(
                 modifier = Modifier.fillMaxSize(),
@@ -321,7 +367,8 @@ fun CardIndicator(
                     text = "$valueIndicator",
                     style = TextStyle(
                         fontSize = 28.sp
-                    )
+                    ),
+                    color = MaterialTheme.colorScheme.onBackground
                 )
 
             }
@@ -371,7 +418,7 @@ fun CircularIndicator(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .offset(y = 10.dp, x = 10.dp)
+            .offset(y = 10.dp ,x = (-10).dp)
             .size(canvasSize)
             .drawBehind {
                 val componentSize = size /sizeCircular
@@ -449,8 +496,8 @@ fun AboutControlCard() {
 
 }
 
-@Preview(showBackground = true, device = "spec:width=1080px,height=2400px,dpi=440")
+@Preview(showBackground = true, device = "spec:width=1080px,height=2400px,dpi=440", showSystemUi = true)
 @Composable
 fun GreetingPreview() {
-    MonitoringScreen()
+    DashBoardMenu({},{})
 }

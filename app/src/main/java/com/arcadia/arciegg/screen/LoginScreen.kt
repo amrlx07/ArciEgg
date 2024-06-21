@@ -1,25 +1,29 @@
 package com.arcadia.arciegg.screen
 
+
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,28 +32,39 @@ import androidx.compose.ui.unit.sp
 import com.arcadia.arciegg.R
 
 @Composable
-fun LoginScreen(@DrawableRes imageResource: Int ) {
-    Box {
-        Row {
-            //Spacer(modifier = Modifier.width(140.dp))
-            Image(
-                painter = painterResource(imageResource),
-                contentDescription = "background image",
-                modifier = Modifier
-                    .offset(x = 140.dp, y = 73.dp)
-                    .alpha(0.6f)
-            )
-        }
+fun LoginScreen(
+    onSignUp: () -> Unit,
+    @DrawableRes imageResource: Int
+) {
+    val gradient = Brush.verticalGradient(
+        colors = listOf(
+            colorResource(id = R.color.orange100),
+            colorResource(id = R.color.orange500)
+        )
+    )
+    Box(
+        modifier = Modifier.background(gradient)
+    ) {
+        Image(
+            painter = painterResource(imageResource),
+            contentDescription = "background image",
+            modifier = Modifier
+                .offset(x = 160.dp, y = 73.dp)
+                .alpha(0.6f)
+        )
         Column(
-            modifier = Modifier.fillMaxHeight()
+            modifier = Modifier.fillMaxSize()
         ) {
-            TextLanding(modifier = Modifier.padding(top = 103.dp, start = 16.dp, bottom = 450.dp))
+            TextLanding(modifier = Modifier.padding(top = 103.dp, start = 20.dp, bottom = 450.dp))
             TextIntruks(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 10.dp)
             )
-            ButtonLogin()
+            ButtonLogin(
+                onSignUp = onSignUp,
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
         }
     }
 }
@@ -110,16 +125,20 @@ fun TextIntruks(
 
 @Composable
 fun ButtonLogin(
-    modifier: Modifier = Modifier) {
+    onSignUp: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Button(
-            onClick = { /*TODO*/ },
+        ElevatedButton(
+            onClick = onSignUp,
             modifier = Modifier
                 .height(61.dp)
-                .width(328.dp)
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(21.dp),
+            colors = ButtonDefaults.elevatedButtonColors(colorResource(R.color.orange100))
             ) {
                 Text(text = "Masuk Dengan akun Google")
             }
@@ -128,16 +147,23 @@ fun ButtonLogin(
             onClick = { /*TODO*/ },
             modifier = Modifier
                 .height(61.dp)
-                .width(328.dp),
-            enabled = false
+                .fillMaxWidth(),
+            enabled = false,
+            shape = RoundedCornerShape(21.dp),
+            colors = ButtonDefaults.outlinedButtonColors(colorResource(R.color.orange100))
         ) {
-            Text(text = "Masuk dengan opsi lainnya")
+            Text(
+                text = "Masuk dengan opsi lainnya",
+                color = colorResource(R.color.black)
+                )
         }
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true,
+    device = "spec:width=1080px,height=2400px,dpi=440"
+)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(R.drawable.flip_2)
+    LoginScreen(onSignUp = {}, imageResource = R.drawable.flip_2)
 }
