@@ -420,6 +420,7 @@ fun CircularIndicator(
         modifier = Modifier
             .offset(y = 10.dp ,x = (-10).dp)
             .size(canvasSize)
+
             .drawBehind {
                 val componentSize = size /sizeCircular
                 backgroundIndicator(

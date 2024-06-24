@@ -10,12 +10,18 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 class SensorListRepository {
-    private val database = FirebaseDatabase.getInstance().reference.child("ARCI_EGG").child("Monitoring").child("data")
+    //path database for fetch data
+    private val databaseList = FirebaseDatabase.getInstance().reference.child("ARCI_EGG").child("Monitoring").child("data")
+    private val databaseMonitoring = FirebaseDatabase.getInstance().reference.child("ARCI_EGG").child("Monitoring")
+    private val databaseControl = FirebaseDatabase.getInstance().reference.child("ARCI_EGG").child("Control")
+    private val databaseSensorCheck = FirebaseDatabase.getInstance().reference.child("ARCI_EGG").child("SensorCheck")
+    private val databaseSetpoint = FirebaseDatabase.getInstance().reference.child("ARCI_EGG").child("SetPoint")
 
-    fun fetchSensorData(): LiveData<List<SensorData>> {
+    fun fetchSensorDataList(): LiveData<List<SensorData>> {
         val liveData = MutableLiveData<List<SensorData>>()
-        database.addValueEventListener(object : ValueEventListener {
+        databaseList.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                Log.d("Firebase", "Successfully to fetch data.")
                 val sensorList = mutableListOf<SensorData>()
                 snapshot.children.forEach { dataSnapshot ->
                     val sensorDetail = dataSnapshot.getValue(SensorData::class.java)
@@ -35,7 +41,7 @@ class SensorListRepository {
     }
 
     fun deleteSensorData() {
-        database.removeValue().addOnCompleteListener { task ->
+        databaseList.removeValue().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Log.d("Firebase", "Data deleted successfully.")
             } else {

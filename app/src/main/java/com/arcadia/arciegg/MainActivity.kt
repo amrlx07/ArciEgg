@@ -4,8 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.arcadia.arciegg.screen.LineScreenMain
 import com.arcadia.arciegg.ui.theme.ArciEggTheme
-import com.arcadia.arciegg.screen.ListDataScreen
+import com.arcadia.arciegg.screen.TabList
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,7 +14,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ArciEggTheme {
-                ListDataScreen()
+                LineScreenMain()
                 //LoginScreen(onSignUp = {}, imageResource = R.drawable.flip_2)
                 /* A surface container using the 'background' color from the theme
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->

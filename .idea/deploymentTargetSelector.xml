@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-06-21T00:16:59.838551900Z">
+        <DropdownSelection timestamp="2024-06-24T04:51:35.087186700Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\KHOIRI\.android\avd\Resizable_Experimental_API_34.avd" />
@@ -17,6 +17,9 @@
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="MainActivity">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="SmoothLineGraph">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
