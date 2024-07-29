@@ -12,6 +12,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import kotlin.math.roundToInt
 
 class LineChartViewModel : ViewModel() {
     private val repository = SensorListRepository()
@@ -19,7 +20,7 @@ class LineChartViewModel : ViewModel() {
 
     init {
         fetchSensorData()
-        scheduleDataDeletion()
+        //scheduleDataDeletion()
     }
     private fun fetchSensorData() {
         repository.fetchSensorDataList()
@@ -42,6 +43,11 @@ class LineChartViewModel : ViewModel() {
                 }
             }
         }
+    }
+
+    fun roundup(formatted: Double?): Double {
+        val roundup = formatted!! * 100.0
+        return roundup.roundToInt() / 100.0
     }
     fun formatDateTime (unixTimestamp: Long): String {
         val date = Date(unixTimestamp * 1000L)

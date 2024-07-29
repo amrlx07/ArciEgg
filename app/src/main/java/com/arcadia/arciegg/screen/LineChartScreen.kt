@@ -1,6 +1,5 @@
 package com.arcadia.arciegg.screen
 
-import android.graphics.PathEffect
 import android.graphics.PointF
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
@@ -38,6 +37,7 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -52,14 +52,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -67,13 +63,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toIntRect
 import androidx.compose.ui.unit.toSize
 import dev.riggaroo.composeplaytime.BarColor
 import dev.riggaroo.composeplaytime.HighlightColor
-import dev.riggaroo.composeplaytime.graphData
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -126,7 +119,9 @@ fun ListDataScreenSuhu(viewModel: LineChartViewModel = viewModel(), valueSelecto
 
     LazyColumn {
         item {
-            LineHeader(title = "Suhu", simbolValue = "Celcius(°C)", modifier = Modifier.padding(10.dp).fillMaxWidth())
+            LineHeader(title = "Suhu", simbolValue = "Celcius(°C)", modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth())
         }
         item {
             LineChart(data = sensorDetailData, valueSelector = valueSelector, setPointValueSelector = setPointValueSelector)
@@ -135,7 +130,7 @@ fun ListDataScreenSuhu(viewModel: LineChartViewModel = viewModel(), valueSelecto
             ListDetailItemHeader(mainValueTitle = "Suhu", setPointTitle = "Batas")
         }
 
-        items(sensorDetailData) { data ->
+        items(sensorDetailData.reversed()) { data ->
             ListDetailItemSuhu(sensorData = data)
         }
     }
@@ -146,7 +141,9 @@ fun ListDataScreenKelembapan(viewModel: LineChartViewModel = viewModel(), valueS
 
     LazyColumn {
         item {
-            LineHeader(title = "Kelembapan", simbolValue = "Persentase(%)", modifier = Modifier.padding(10.dp).fillMaxWidth())
+            LineHeader(title = "Kelembapan", simbolValue = "Persentase(%)", modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth())
         }
         item {
             LineChart(data = sensorDetailData, valueSelector = valueSelector, setPointValueSelector = setPointValueSelector)
@@ -155,7 +152,7 @@ fun ListDataScreenKelembapan(viewModel: LineChartViewModel = viewModel(), valueS
             ListDetailItemHeader(mainValueTitle = "Kelembapan", setPointTitle = "Batas")
         }
 
-        items(sensorDetailData) { data ->
+        items(sensorDetailData.reversed()) { data ->
             ListDetailItemKelembapan(sensorData = data)
         }
     }
@@ -168,19 +165,57 @@ fun LineHeader(
     simbolValue: String
 ) {
     OutlinedCard(modifier = modifier) {
-        Column(
-            modifier = Modifier.padding(10.dp),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Center
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge
-            )
-            Text(
-                text = simbolValue,
-                style = MaterialTheme.typography.titleMedium
-            )
+            Column(
+                modifier = Modifier.padding(10.dp),
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Text(
+                    text = simbolValue,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Column(
+                modifier = Modifier.padding(10.dp),
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Nilai",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    HorizontalDivider(
+                        color = Color.Green,
+                        modifier = Modifier.width(40.dp).padding(5.dp),
+                        thickness = 5.dp
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Batas Nilai",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    HorizontalDivider(
+                        color = Color.Red,
+                        modifier = Modifier.width(40.dp).padding(5.dp),
+                        thickness = 5.dp
+                    )
+                }
+            }
         }
     }
 }
@@ -201,7 +236,7 @@ fun ListDetailItemSuhu(sensorData: SensorData, viewModel: LineChartViewModel = v
         ) {
             Text(text = formattedDate, modifier = Modifier.padding(5.dp))
             VerticalDivider(modifier = Modifier.height(20.dp))
-            Text(text = "${sensorData.Suhu}", modifier = Modifier.padding(5.dp))
+            Text(text = "${viewModel.roundup(sensorData.Suhu)}", modifier = Modifier.padding(5.dp))
             VerticalDivider(modifier = Modifier.height(20.dp))
             Text(text = "${sensorData.SetPointSuhu}", modifier = Modifier.padding(5.dp))
         }
@@ -249,7 +284,7 @@ fun ListDetailItemKelembapan(sensorData: SensorData, viewModel: LineChartViewMod
         ) {
             Text(text = formattedDate, modifier = Modifier.padding(5.dp))
             VerticalDivider(modifier = Modifier.height(20.dp))
-            Text(text = "${sensorData.Kelembapan}", modifier = Modifier.padding(5.dp))
+            Text(text = "${viewModel.roundup(sensorData.Kelembapan)}", modifier = Modifier.padding(5.dp))
             VerticalDivider(modifier = Modifier.height(20.dp))
             Text(text = "${sensorData.SetPointKelembapan}", modifier = Modifier.padding(5.dp))
         }
@@ -298,15 +333,15 @@ fun LineChart(data: List<SensorData>, valueSelector: (SensorData) -> Double, set
             }
             .pointerInput(Unit) {
                 detectDragGesturesAfterLongPress(
-                    onDragStart = {offset ->
+                    onDragStart = { offset ->
                         highlightedWeek =
-                            (offset.x / (size.width / (data.size -1 ))).roundToInt()
+                            (offset.x / (size.width / (data.size - 1))).roundToInt()
                     },
-                    onDragEnd = {highlightedWeek = null},
-                    onDragCancel = {highlightedWeek = null},
-                    onDrag = {change , _ ->
+                    onDragEnd = { highlightedWeek = null },
+                    onDragCancel = { highlightedWeek = null },
+                    onDrag = { change, _ ->
                         highlightedWeek =
-                            (change.position.x / (size.width / (data.size -1 ))).roundToInt()
+                            (change.position.x / (size.width / (data.size - 1))).roundToInt()
                     }
                 )
             }
@@ -366,8 +401,8 @@ fun LineChart(data: List<SensorData>, valueSelector: (SensorData) -> Double, set
                         )
                     }
                     // draw highlight if user is dragging
-                    highlightedWeek?.let {week ->
-                        if (week in data.indices){
+                    highlightedWeek?.let { week ->
+                        if (week in data.indices) {
                             this.drawHighlight(
                                 highlightedWeek = week,
                                 graphData = data,

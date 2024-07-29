@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -21,14 +22,20 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.ui.geometry.Size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Air
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.NotificationsNone
+import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,6 +56,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
@@ -63,100 +72,126 @@ import com.arcadia.arciegg.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import com.arcadia.arciegg.uiState.UserData
+import com.arcadia.arciegg.viewModel.DashBoardMonitoringViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashBoardMenu(
     onSignOut: () -> Unit,
-    onNotication: () -> Unit
+    userData: UserData?,
+    detailScreen: () -> Unit,
+    //onNotication: () -> Unit
 ) {
-//    val gradient = Brush.verticalGradient(
-//        colors = listOf(
-//            colorResource(id = R.color.orange100),
-//            colorResource(id = R.color.orange500)
-//        )
-//    )
+
     Scaffold(
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 title = {
-                    Text(text = "Arci Egg")
+                    Text(text = "Arci Egg",
+                        fontSize = 30.sp)
                 },
                 actions = {
                     HeaderDashboard(
                         onSignOut = onSignOut,
-                        onNotication = onNotication
+                        //onNotication = onNotication
                     )
                 }
             )
         },
         content = { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
-                Column(
+                LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background)
-                        .verticalScroll(rememberScrollState())
-                    ,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .background(MaterialTheme.colorScheme.background),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp) // Add spacing between items
                 ) {
-                    Box{
-                        ElevatedCard(
-                            modifier = Modifier.fillMaxWidth().height(300.dp),
-                            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                            shape = RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp, bottomStart = 68.dp, bottomEnd = 0.dp)
-                        ) { }
-                        Image(
-                            painter = painterResource(R.drawable.inkubator_telur_bebek_2024_jun_01_06_03_54pm_000_customizedview158771619164),
-                            contentDescription = "background image",
-                            modifier = Modifier.offset(x = 200.dp, y = 70.dp).scale(1f)
-                        )
+                    item {
+                        Box {
+                            ElevatedCard(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(300.dp), // Let the card adjust its height
+                                ///colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                                shape = RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp, bottomStart = 68.dp, bottomEnd = 0.dp)
+                            ) {  }
 
-                        Column {
-                            //HeaderDashboard()
-                            Spacer(modifier = Modifier.height(24.dp))
-                            ProfileDasboard()
+                            Image(
+                                painter = painterResource(R.drawable.inkubator_telur_bebek_2024_jun_01_06_03_54pm_000_customizedview158771619164),
+                                contentDescription = "background image",
+                                modifier = Modifier
+                                    .offset(x = 200.dp, y = 70.dp)
+                                    .scale(1f)
+                            )
+
+                            Column {
+                                Spacer(modifier = Modifier.height(24.dp))
+                                val userName = userData?.userName ?: "Pengguna"
+                                ProfileDasboard(userName = userName, userData = userData)
+                            }
                         }
                     }
-                    Spacer(modifier = Modifier.height(15.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.padding(horizontal = 18.dp)
-                    ) {
-                        Text(text = "Monitoring",
-                            style = TextStyle(
-                                fontSize = 16.sp
-                            ),
-                            modifier = Modifier.padding(end = 10.dp),
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
+
+                    item {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.padding(horizontal = 18.dp)
+                        ) {
+                            Text(
+                                text = "Monitoring",
+                                style = TextStyle(fontSize = 16.sp),
+                                modifier = Modifier.padding(end = 10.dp),
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                            HorizontalDivider()
+                        }
+                    }
+
+                    item {
+                        MiniDashboard(detailScreen = detailScreen)
+                    }
+
+                    item {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.padding(horizontal = 18.dp)
+                        ) {
+                            Text(
+                                text = "Tentang Kontrol Otomatis",
+                                style = TextStyle(fontSize = 16.sp),
+                                modifier = Modifier.padding(end = 10.dp),
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                            HorizontalDivider()
+                        }
+                    }
+
+                    item {
+                        LazyAboutControl()
+                    }
+                    item {
+                        Spacer(modifier = Modifier.height(70.dp))
+                    }
+                    item {
                         HorizontalDivider()
                     }
-                    Spacer(modifier = Modifier.height(15.dp))
-                    MiniDashboard()
-                    Spacer(modifier = Modifier.height(15.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.padding(horizontal = 18.dp)
-                    ) {
-                        Text(text = "Tentang Kontrol Otomatis",
-                            style = TextStyle(
-                                fontSize = 16.sp
-                            ),
-                            modifier = Modifier.padding(end = 10.dp),
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                        HorizontalDivider()
-                    }
-                    Spacer(modifier = Modifier.height(15.dp))
-                    LazyAboutControl()
+
+                    // Add more items as needed
                 }
             }
         }
@@ -166,7 +201,7 @@ fun DashBoardMenu(
 @Composable
 fun HeaderDashboard(
     onSignOut: () -> Unit,
-    onNotication: () -> Unit
+    //onNotication: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -188,7 +223,7 @@ fun HeaderDashboard(
             ),
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(start = 12.dp))
-        Spacer(modifier = Modifier.width(120.dp))
+        Spacer(modifier = Modifier.width(170.dp))
         IconButton(
             onClick = onSignOut,
             modifier = Modifier.width(50.dp)
@@ -208,6 +243,7 @@ fun HeaderDashboard(
             }
         }
         Spacer(modifier = Modifier.width(26.dp))
+        /*
         IconButton(
             onClick = onNotication,
             modifier = Modifier
@@ -218,14 +254,14 @@ fun HeaderDashboard(
                 imageVector = Icons.Filled.NotificationsNone,
                 contentDescription = "Notification"
             )
-        }
+        }*/
     }
 }
 
 @Composable
-fun ProfileDasboard() {
+fun ProfileDasboard(userName: String, userData: UserData? ) {
     Column(
-        modifier = Modifier.padding(start = 16.dp)
+        modifier = Modifier.padding(start = 16.dp, top = 50.dp)
     ) {
         Text(
             text = "Selamat Datang",
@@ -235,21 +271,35 @@ fun ProfileDasboard() {
             color = MaterialTheme.colorScheme.onBackground
         )
         Row(
+            modifier = Modifier.padding(top = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Icon(
-                imageVector = Icons.Filled.AccountCircle,
-                contentDescription = "Akun",
-                modifier = Modifier
-                    .width(50.dp)
-                    .height(50.dp)
+            if(userData?.profilPictureUrl != null) {
+                AsyncImage(
+                    model = userData.profilPictureUrl,
+                    contentDescription = "Akun",
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .width(50.dp)
+                        .height(50.dp),
+                    contentScale = ContentScale.Crop
                 )
+            } else {
+                Icon(
+                    imageVector = Icons.Filled.AccountCircle,
+                    contentDescription = "Akun",
+                    modifier = Modifier
+                        .width(50.dp)
+                        .height(50.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                text = "userid102597",
+                text = userName,
                 style = TextStyle(
-                    fontSize = 16.sp
+                    fontSize = 20.sp
                 ),
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -258,13 +308,22 @@ fun ProfileDasboard() {
 }
 
 @Composable
-fun MiniDashboard() {
+fun MiniDashboard(
+    viewModel: DashBoardMonitoringViewModel = viewModel(),
+    detailScreen: () -> Unit,
+
+) {
+    val state by viewModel.stateMonitor.collectAsStateWithLifecycle()
+    val temperature = state?.Suhu
+    val humidity = state?.Kelembapan
+
     ElevatedCard(
+        onClick = detailScreen,
         modifier = Modifier
             .width(328.dp)
             .height(185.dp),
         shape = RoundedCornerShape(36.dp),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        //colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -280,9 +339,10 @@ fun MiniDashboard() {
                 CardIndicator(
                     textIndicator = "Suhu",
                     R.drawable.temperature,
-                    R.color.blue500,
-                    "suhu",
-                    30.0f ,
+                    containerColor = MaterialTheme.colorScheme.inversePrimary,
+                    contentDescription = "suhu",
+                    valueIndicator = viewModel.roundup(temperature) ,
+                    symbol = "°C",
                     modifier = Modifier
                         .width(17.dp)
                         .height(33.dp)
@@ -292,9 +352,10 @@ fun MiniDashboard() {
                 CardIndicator(
                     textIndicator = "Kelembapan",
                     R.drawable.humidity,
-                    R.color.green500,
-                    "Kelembapan",
-                    70.0f,
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentDescription = "Kelembapan",
+                    valueIndicator = viewModel.roundup(humidity),
+                    symbol = "%",
                     modifier = Modifier
                         .width(20.dp)
                         .height(24.dp)
@@ -304,18 +365,18 @@ fun MiniDashboard() {
             Box{
                 CircularIndicator(
                     sizeCircular = 1.25f,
-                    indicatorValue = 30.0,
+                    indicatorValue = temperature,
                     maxIndicatorValue = 100,
-                    backgroundIndicatorColor = Color(0xFFFFEDE8),
-                    foregroundIndicatorColor = Color(0xFF83B4FF),
+                    backgroundIndicatorColor = MaterialTheme.colorScheme.surfaceDim,
+                    foregroundIndicatorColor = MaterialTheme.colorScheme.inversePrimary,
                     label = "Temperature"
                     )
                 CircularIndicator(
                     sizeCircular = 2f,
-                    indicatorValue = 70.0,
+                    indicatorValue = humidity,
                     maxIndicatorValue = 100,
-                    backgroundIndicatorColor = Color(0xFFFEECE7),
-                    foregroundIndicatorColor = Color(0xFFA9F2C6),
+                    backgroundIndicatorColor = MaterialTheme.colorScheme.surfaceDim,
+                    foregroundIndicatorColor = MaterialTheme.colorScheme.secondaryContainer,
                     label = "Humidity"
                 )
             }
@@ -328,17 +389,18 @@ fun MiniDashboard() {
 fun CardIndicator(
     textIndicator: String,
     @DrawableRes iconIndicator: Int,
-    @ColorRes colorBackgroundIndicator: Int,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     contentDescription: String,
-    valueIndicator: Float,
-    modifier: Modifier = Modifier
+    valueIndicator: Double?,
+    modifier: Modifier = Modifier,
+    symbol: String
 ) {
     ElevatedCard(
         modifier = Modifier
             .width(126.dp)
             .height(70.dp),
         shape = RoundedCornerShape(21.dp),
-        colors = CardDefaults.elevatedCardColors(colorResource(colorBackgroundIndicator)),
+        colors = CardDefaults.elevatedCardColors(containerColor = containerColor),
 
     ) {
         Column(
@@ -367,6 +429,13 @@ fun CardIndicator(
                     text = "$valueIndicator",
                     style = TextStyle(
                         fontSize = 28.sp
+                    ),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = symbol,
+                    style = TextStyle(
+                        fontSize = 20.sp
                     ),
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -418,11 +487,11 @@ fun CircularIndicator(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .offset(y = 10.dp ,x = (-10).dp)
+            .offset(y = 10.dp, x = (-10).dp)
             .size(canvasSize)
 
             .drawBehind {
-                val componentSize = size /sizeCircular
+                val componentSize = size / sizeCircular
                 backgroundIndicator(
                     componentSize = componentSize,
                     indicatorColor = backgroundIndicatorColor,
@@ -486,19 +555,91 @@ fun DrawScope.foregroundIndicator(
         )
     )
 }
-
+@Preview
 @Composable
-fun LazyAboutControl() {
-
+fun LazyAboutControl(viewModel: DashBoardMonitoringViewModel = viewModel()) {
+    val state by viewModel.stateControl.collectAsStateWithLifecycle()
+    val fan = state?.Fan
+    val heater = state?.Heater
+    val sprayer = state?.Sprayer
+    var fanCondition = viewModel.condition(fan)
+    var sprayerCondition = viewModel.condition(sprayer)
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(25.dp),
+        contentPadding = PaddingValues(horizontal = 25.dp)
+    ) {
+        item { AboutControlCard(
+            title = "Kipas",
+            value = fanCondition,
+            icon = Icons.Filled.Air
+        ) }
+        item { AboutControlCard(
+            title = "Heater",
+            value = "$heater %",
+            icon = Icons.Filled.LocalFireDepartment
+        ) }
+        item { AboutControlCard(
+            title = "Sprayer",
+            value = sprayerCondition,
+            icon = Icons.Filled.WaterDrop
+        ) }
+    }
 }
-
+//@Preview
 @Composable
-fun AboutControlCard() {
+fun AboutControlCard(
+    modifier: Modifier = Modifier,
+    title: String,
+    value: String,
+    icon: ImageVector
+) {
+    ElevatedCard(
+        modifier = Modifier
+            .width(120.dp)
+            .height(104.dp),
+        shape = RoundedCornerShape(21.dp),
+        //colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            //verticalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Text(title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(top = 5.dp))
+            Box(
+                //verticalAlignment = Alignment.CenterVertically,
+                //horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = "",
+                    modifier = Modifier
+                        .width(88.dp)
+                        .height(88.dp)
+                        .offset(x = -40.dp)
+                        .alpha(0.4f)
+                )
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Text(
+                        text = value,
+                        style = MaterialTheme.typography.displaySmall
+                       
+                    )
+                }
+            }
+        }
 
+    }
 }
 
 @Preview(showBackground = true, device = "spec:width=1080px,height=2400px,dpi=440", showSystemUi = true)
 @Composable
 fun GreetingPreview() {
-    DashBoardMenu({},{})
+
+    //DashBoardMenu({},{},userData = )
 }
